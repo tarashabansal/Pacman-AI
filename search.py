@@ -35,7 +35,7 @@ class SearchProblem:
 
     def isGoalState(self, state):
         """
-          state: Search state
+        state: Search state
 
         Returns True if and only if the state is a valid goal state.
         """
@@ -43,7 +43,7 @@ class SearchProblem:
 
     def getSuccessors(self, state):
         """
-          state: Search state
+        state: Search state
 
         For a given state, this should return a list of triples, (successor,
         action, stepCost), where 'successor' is a successor to the current
@@ -54,7 +54,7 @@ class SearchProblem:
 
     def getCostOfActions(self, actions):
         """
-         actions: A list of actions to take
+        actions: A list of actions to take
 
         This method returns the total cost of a particular sequence of actions.
         The sequence must be composed of legal moves.
@@ -106,8 +106,6 @@ def depthFirstSearch(problem):
         path = pathToCurrent.pop()
     return path
 
-   
-
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
@@ -116,7 +114,7 @@ def breadthFirstSearch(problem):
     fringe.push(problem.getStartState())
     visited = []                 # List to check whether state has already been visited
     path=[]                         # Final direction list
-    pathToCurrent=Queue()           # Stack to maintaining path from start to a state
+    pathToCurrent=Queue()           # Queue to maintaining path from start to a state
     currState = fringe.pop()
     while not problem.isGoalState(currState):
         if currState not in visited:
@@ -129,6 +127,7 @@ def breadthFirstSearch(problem):
         currState = fringe.pop()
         path = pathToCurrent.pop()
     return path
+
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"

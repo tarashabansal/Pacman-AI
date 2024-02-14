@@ -66,8 +66,8 @@ class SearchAgent(Agent):
     location (1,1)
 
     Options for fn include:
-      depthFirstSearch or dfs
-      breadthFirstSearch or bfs
+    depthFirstSearch or dfs
+    breadthFirstSearch or bfs
 
 
     Note: You should NOT change any code in SearchAgent
@@ -184,12 +184,12 @@ class PositionSearchProblem(search.SearchProblem):
         """
         Returns successor states, the actions they require, and a cost of 1.
 
-         As noted in search.py:
-             For a given state, this should return a list of triples,
-         (successor, action, stepCost), where 'successor' is a
-         successor to the current state, 'action' is the action
-         required to get there, and 'stepCost' is the incremental
-         cost of expanding to that successor
+        As noted in search.py:
+        For a given state, this should return a list of triples,
+        (successor, action, stepCost), where 'successor' is a
+        successor to the current state, 'action' is the action
+        required to get there, and 'stepCost' is the incremental
+        cost of expanding to that successor
         """
 
         successors = []
@@ -425,8 +425,8 @@ class FoodSearchProblem:
     food (dots) in a Pacman game.
 
     A search state in this problem is a tuple ( pacmanPosition, foodGrid ) where
-      pacmanPosition: a tuple (x,y) of integers specifying Pacman's position
-      foodGrid:       a Grid (see game.py) of either True or False, specifying remaining food
+    pacmanPosition: a tuple (x,y) of integers specifying Pacman's position
+    foodGrid:       a Grid (see game.py) of either True or False, specifying remaining food
     """
     def __init__(self, startingGameState):
         self.start = (startingGameState.getPacmanPosition(), startingGameState.getFood())
