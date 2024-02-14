@@ -283,39 +283,52 @@ class CornersProblem(search.SearchProblem):
         self.corners = ((1,1), (1,top), (right, 1), (right, top))
         for corner in self.corners:
             if not startingGameState.hasFood(*corner):
-                print('Warning: no food in corner ' + str(corner))
+                print ('Warning: no food in corner ' + str(corner))
         self._expanded = 0 # DO NOT CHANGE; Number of search nodes expanded
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
-
+        self.startingGameState = startingGameState
+        
     def getStartState(self):
         """
         Returns the start state (in your state space, not the full Pacman state
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        """ A state space can be the start coordinates and a list to hold visited corners"""
+        return (self.startingPosition,[])
+        #util.raiseNotDefined()
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        """ Check to see if a state is a corner, and if so are the other corners visited"""
+        xy = state[0]
+        visitedCorners = state[1]
+        if xy in self.corners:
+            if not xy in visitedCorners:
+                visitedCorners.append(xy)
+            return len(visitedCorners) == 4
+        return False
+
+        #util.raiseNotDefined()
 
     def getSuccessors(self, state):
         """
         Returns successor states, the actions they require, and a cost of 1.
 
-         As noted in search.py:
+        As noted in search.py:
             For a given state, this should return a list of triples, (successor,
             action, stepCost), where 'successor' is a successor to the current
             state, 'action' is the action required to get there, and 'stepCost'
             is the incremental cost of expanding to that successor
         """
-
         successors = []
+        x,y = state[0]
+        visitedCorners = state[1]
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             # Add a successor state to the successor list if the action is legal
             # Here's a code snippet for figuring out whether a new position hits a wall:
@@ -326,7 +339,23 @@ class CornersProblem(search.SearchProblem):
 
             "*** YOUR CODE HERE ***"
 
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            hitsWall = self.walls[nextx][nexty]
+            if not hitsWall:
+                # Initialize a list of Visited corners for a successor using the visited corner list in state space.
+                successorVisitedCorners = list(visitedCorners)
+                next_node = (nextx, nexty)
+                # Add node to the Visited corner list if it is a corner and not already in the list
+                if next_node in self.corners:
+                    if not next_node in successorVisitedCorners:
+                        successorVisitedCorners.append(next_node)
+                # Create a new state according to the state space and append it to the successor list.
+                successor = ((next_node, successorVisitedCorners), action, 1)
+                successors.append(successor)
+                
         self._expanded += 1 # DO NOT CHANGE
+
         return successors
 
     def getCostOfActions(self, actions):
@@ -347,10 +376,10 @@ def cornersHeuristic(state, problem):
     """
     A heuristic for the CornersProblem that you defined.
 
-      state:   The current search state
-               (a data structure you chose in your search problem)
+    state:   The current search state
+            (a data structure you chose in your search problem)
 
-      problem: The CornersProblem instance for this layout.
+    problem: The CornersProblem instance for this layout.
 
     This function should always return a number that is a lower bound on the
     shortest path from the state to a goal of the problem; i.e.  it should be
@@ -360,7 +389,29 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    #return 0 # Default to trivial solution
+    xy = state[0]
+    visitedCorners = state[1]
+    #Finding out the not visited corners
+    unvisitedCorners = []
+    for corner in corners:
+        if not (corner in visitedCorners):
+            unvisitedCorners.append(corner)
+            
+    """ A heuristic could be maximum of Manhattan distance between current
+        position and all unvisited corners."""
+##    from util import manhattanDistance    
+##    heuristicvalue=[0]
+##    for corner in unvisitedCorners:
+##        heuristicvalue.append(manhattanDistance(xy,corner))
+##    return max(heuristicvalue)
+    
+    """ Using Maze Distance to farthest corner as the heuristic. """
+    heuristicvalue=[0]
+    for corner in unvisitedCorners:
+        heuristicvalue.append(mazeDistance(xy,corner,problem.startingGameState))
+    return max(heuristicvalue)
+
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -454,7 +505,27 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    foodposition = foodGrid.asList()
+    
+    """ Manhattan distance to the farthest food from the current state """
+    #Manhattan distance fails for some cases. so using Maze distance as heuristic
+    #FAIL: test_cases/q7/food_heuristic_grade_tricky.test
+    #expanded nodes: 9551
+    #thresholds: [15000, 12000, 9000, 7000]
+
+    ### Question q7: 3/4 ###
+    # from util import manhattanDistance
+    # # import math
+    # heuristic = [0]
+    # for pos in foodposition:
+    #     heuristic.append( manhattanDistance(position,pos) )
+    # return max(heuristic)
+    
+    """ Using Maze Distance to farthest food as a heuristic (Maze distance is bfs )"""
+    heuristic = [0]
+    for pos in foodposition:
+        heuristic.append(mazeDistance(position,pos,problem.startingGameState))
+    return max(heuristic)
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -485,7 +556,9 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        """ Using BFS defined in search.py to find the goal""" 
+        from search import breadthFirstSearch
+        return breadthFirstSearch(problem)
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -521,7 +594,8 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x,y = state
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        """ A state is a goal if there is food on that position"""
+        return state in self.food.asList()
 
 def mazeDistance(point1, point2, gameState):
     """
@@ -540,3 +614,6 @@ def mazeDistance(point1, point2, gameState):
     assert not walls[x2][y2], 'point2 is a wall: ' + str(point2)
     prob = PositionSearchProblem(gameState, start=point1, goal=point2, warn=False, visualize=False)
     return len(search.bfs(prob))
+
+
+

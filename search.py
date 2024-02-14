@@ -87,17 +87,72 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from util import Stack
+    fringe = Stack()                # Fringe to manage which states to expand
+    fringe.push(problem.getStartState())
+    visited = []                 # List to check whether state has already been visited
+    path=[]                         # Final direction list
+    pathToCurrent=Stack()           # Stack to maintaining path from start to a state
+    currState = fringe.pop()
+    while not problem.isGoalState(currState):
+        if currState not in visited:
+            visited.append(currState)
+            successors = problem.getSuccessors(currState)
+            for child,direction,cost in successors:
+                fringe.push(child)
+                tempPath = path + [direction]
+                pathToCurrent.push(tempPath)
+        currState = fringe.pop()
+        path = pathToCurrent.pop()
+    return path
+
+   
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
-
+    from util import Queue
+    fringe = Queue()                # Fringe to manage which states to expand
+    fringe.push(problem.getStartState())
+    visited = []                 # List to check whether state has already been visited
+    path=[]                         # Final direction list
+    pathToCurrent=Queue()           # Stack to maintaining path from start to a state
+    currState = fringe.pop()
+    while not problem.isGoalState(currState):
+        if currState not in visited:
+            visited.append(currState)
+            successors = problem.getSuccessors(currState)
+            for child,direction,cost in successors:
+                fringe.push(child)
+                tempPath = path + [direction]
+                pathToCurrent.push(tempPath)
+        currState = fringe.pop()
+        path = pathToCurrent.pop()
+    return path
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from util import PriorityQueue
+    fringe = PriorityQueue()                    # Fringe to manage which states to expand
+    fringe.push(problem.getStartState(),0)
+    visited = []                                # List to check whether state has already been visited
+    tempPath=[]                                 # Temp variable to get intermediate paths
+    path=[]                                     # List to store final sequence of directions 
+    pathToCurrent=PriorityQueue()               # Queue to store direction to children (currState and pathToCurrent go hand in hand)
+    currState = fringe.pop()
+    while not problem.isGoalState(currState):
+        if currState not in visited:
+            visited.append(currState)
+            successors = problem.getSuccessors(currState)
+            for child,direction,cost in successors:
+                tempPath = path + [direction]
+                costToGo = problem.getCostOfActions(tempPath)
+                if child not in visited:
+                    fringe.push(child,costToGo)
+                    pathToCurrent.push(tempPath,costToGo)
+        currState = fringe.pop()
+        path = pathToCurrent.pop()    
+    return path
 
 def nullHeuristic(state, problem=None):
     """
@@ -109,7 +164,28 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from util import Queue,PriorityQueue
+    fringe = PriorityQueue()                    # Fringe to manage which states to expand
+    fringe.push(problem.getStartState(),0)
+    currState = fringe.pop()
+    visited = []                                # List to check whether state has already been visited
+    tempPath=[]                                 # Temp variable to get intermediate paths
+    path=[]                                     # List to store final sequence of directions 
+    pathToCurrent=PriorityQueue()               # Queue to store direction to children (currState and pathToCurrent go hand in hand)
+    while not problem.isGoalState(currState):
+        if currState not in visited:
+            visited.append(currState)
+            successors = problem.getSuccessors(currState)
+            for child,direction,cost in successors:
+                tempPath = path + [direction]
+                costToGo = problem.getCostOfActions(tempPath) + heuristic(child,problem)
+                if child not in visited:
+                    fringe.push(child,costToGo)
+                    pathToCurrent.push(tempPath,costToGo)
+        currState = fringe.pop()
+        path = pathToCurrent.pop()    
+    return path
+
 
 
 # Abbreviations
@@ -117,3 +193,4 @@ bfs = breadthFirstSearch
 dfs = depthFirstSearch
 astar = aStarSearch
 ucs = uniformCostSearch
+
